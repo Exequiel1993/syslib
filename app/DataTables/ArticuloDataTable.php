@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\Articulo;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
+use Illuminate\Support\Carbon;
 
 class ArticuloDataTable extends DataTable
 {
@@ -30,7 +31,21 @@ class ArticuloDataTable extends DataTable
     public function query(Articulo $model)
     {
 
-        return $model->newQuery()->with(['tipo','marca']);
+
+        $start_date = $this->request()->get('start_date');
+        $end_date = $this->request()->get('end_date');
+
+        $query = $model->newQuery()->with(['tipo','marca']);
+
+        if (!empty($start_date) && !empty($end_date)) {
+            
+            $sdate =  Carbon::parse($start_date);
+            $edate =  Carbon::parse($end_date);
+
+            $query = $query->whereBetween('created_at',[$sdate,$edate]);
+        }
+
+        return $query;
     }
 
     /**
@@ -41,6 +56,7 @@ class ArticuloDataTable extends DataTable
     public function html()
     {
         return $this->builder()
+            ->setTableId('dataTableBuilder')      
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->addAction(['width' => '120px', 'printable' => false])
@@ -52,7 +68,8 @@ class ArticuloDataTable extends DataTable
                 'language'=> ['url'=>'//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json',],
                 'paging'=>true,
                 'buttons'   => [
-                 /*   ['extend' => 'create', 'className' => 'btn btn-default btn-sm no-corner',],
+                    ['extend' => 'export', 'className' => 'btn btn-default btn-sm no-corner',],    
+                 /* ['extend' => 'create', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'export', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'print', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'reset', 'className' => 'btn btn-default btn-sm no-corner',],
@@ -70,6 +87,7 @@ class ArticuloDataTable extends DataTable
     protected function getColumns()
     {
         return [
+            
             'codigoUnico',
             'tipo'=> new \Yajra\DataTables\Html\Column(['title'=>'TipoArticulo','data'=>'tipo.nombre','name'=>'tipo.nombre']),
            //'imagen',

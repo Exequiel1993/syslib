@@ -33,3 +33,7 @@ Route::resource('articulos', 'ArticuloController');
 Route::resource('proveedors', 'ProveedorController');
 
 Route::resource('compras', 'CompraController');
+
+Route::get('/pdf','PDFcontroller@pdf')->name('descargarPDF');
+
+Route::get('/pdfarticulos','PDFcontroller@pdfArticulos')->name('descargarPDFarticulos');

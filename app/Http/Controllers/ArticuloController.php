@@ -32,6 +32,7 @@ class ArticuloController extends AppBaseController
      */
     public function index(ArticuloDataTable $articuloDataTable)
     {
+        
         return $articuloDataTable->render('articulos.index');
     }
 

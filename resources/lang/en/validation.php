@@ -95,7 +95,8 @@ return [
     'numeric' => 'The :attribute must be a number.',
     'present' => 'The :attribute field must be present.',
     'regex' => 'The :attribute format is invalid.',
-    'required' => 'The :attribute field is required.',
+    //'required' => 'The :attribute field is required.',
+    'required' => 'El campo :attribute es requerido.',
     'required_if' => 'The :attribute field is required when :other is :value.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
     'required_with' => 'The :attribute field is required when :values is present.',
@@ -133,6 +134,33 @@ return [
             'rule-name' => 'custom-message',
         ],
     ],
+
+
+
+    'custom' => [
+        'cantidad' => [
+            'digits_between' => 'El campo Cantidad no puede ser negativa',
+        ],
+    ],
+
+    'custom' => [
+        'precioVenta' => [
+            'digits_between' => 'El campo Rrecio Venta no puede ser negativa',
+        ],
+    ],
+
+    'custom' => [
+        'stockMinimo' => [
+            'digits_between' => 'El campo Stock Minimo no puede ser negativa',
+        ],
+    ],
+
+    'custom' => [
+        'stockMaximo' => [
+            'digits_between' => 'El campo Stock Maximo no puede ser negativa',
+        ],
+    ],
+
 
     /*
     |--------------------------------------------------------------------------

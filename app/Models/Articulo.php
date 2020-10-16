@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\ImageTrait;
+use Barryvdh\LaravelIdeHelper\Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 /**
  * Class Articulo
@@ -40,6 +46,7 @@ class Articulo extends Model
         'stockMaximo',
         'tipoArticulo_id',
         'marca_id'
+        
     ];
 
     /**
@@ -66,12 +73,18 @@ class Articulo extends Model
      */
     public static $rules = [
         'codigoUnico' => 'required',
-        'cantidad' => 'required',
+        'cantidad' => 'required|digits_between:0,999999999999',
         'precioVenta' => 'required',
-        'stockMinimo' => 'required',
-        'stockMaximo' => 'required',
+        'stockMinimo' => 'required|digits_between:0,999999999999',
+        'stockMaximo' => 'required|digits_between:0,999999999999',
         'tipoArticulo_id' => 'required',
         'marca_id' => 'required'
+    ];
+
+    public static $messages = [
+        'cantidad.required'=> 'La cantidad no puede tener valores negativos',
+        'codigoUnico.required'=> 'El codigo unico no debe repetirse'
+        
     ];
 
     public function tipo(){
