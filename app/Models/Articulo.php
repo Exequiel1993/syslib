@@ -41,7 +41,7 @@ class Articulo extends Model
         'descripcion',
         'imagen',
         'cantidad',
-        'precioVenta',
+        
         'stockMinimo',
         'stockMaximo',
         'tipoArticulo_id',
@@ -59,7 +59,7 @@ class Articulo extends Model
         'codigoUnico' => 'string',
         'imagen' => 'string',
         'cantidad' => 'integer',
-        'precioVenta' => 'string',
+        
         'stockMinimo' => 'string',
         'stockMaximo' => 'string',
         'tipoArticulo_id' => 'integer',
@@ -74,7 +74,7 @@ class Articulo extends Model
     public static $rules = [
         'codigoUnico' => 'required',
         'cantidad' => 'required|digits_between:0,999999999999',
-        'precioVenta' => 'required',
+        
         'stockMinimo' => 'required|digits_between:0,999999999999',
         'stockMaximo' => 'required|digits_between:0,999999999999',
         'tipoArticulo_id' => 'required',

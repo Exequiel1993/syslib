@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\ProveedorDataTable;
-use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateProveedorRequest;
 use App\Http\Requests\UpdateProveedorRequest;
 use App\Repositories\ProveedorRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Informe;
+use DB;
+use App\Models\Proveedor;
 
 class ProveedorController extends AppBaseController
 {
@@ -27,9 +30,87 @@ class ProveedorController extends AppBaseController
      * @param ProveedorDataTable $proveedorDataTable
      * @return Response
      */
-    public function index(ProveedorDataTable $proveedorDataTable)
+    public function index(Request $request)
     {
-        return $proveedorDataTable->render('proveedors.index');
+
+        $desde = $request->get('desde');
+        $hasta = $request->get('hasta');
+        $buscar = $request->get('buscarTexto');
+        $informe = Informe::find(1);
+
+        $proveedor=DB::table('proveedors')
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+        //Filtro 
+        if ($request->exists('filtrar')) {
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+                    $proveedor=DB::table('proveedors')
+                        ->whereBetween('created_at',[$desde,$hasta])
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+                    
+
+                    return view('proveedors.index',["proveedor"=>$proveedor,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+            
+            if(!is_null($desde) && is_null($hasta)){
+
+                    $proveedor=DB::table('proveedors')
+                        ->where('created_at','>=',$desde)
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+                    
+
+                    return view('proveedors.index',["proveedor"=>$proveedor,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+        }
+
+            if ($request->exists('pdf')) {
+
+            $reporte = \App::make('dompdf.wrapper');
+            $nombreInforme = "Proveedores";
+           
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+                    $proveedor =DB::table('proveedors')
+                        ->whereBetween('created_at',[$desde,$hasta])
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+            }
+
+             if(!is_null($desde) && is_null($hasta)){
+
+                    $proveedor =DB::table('proveedors')
+                        ->where('created_at','>=',$desde)
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+            }
+            $reporte->loadView('reportes.informeProveedor',compact('proveedor','informe','desde','hasta','nombreInforme'))->setPaper('a4');
+
+            return $reporte->download('Reporte' . '.pdf');
+            //return $tipoArticulo;
+
+        }
+
+        
+
+
+
+        //DD($proveedor);
+
+        //return $proveedorDataTable->render('proveedors.index');
+        return view('proveedors.index',compact('proveedor','desde','hasta'));
     }
 
     /**

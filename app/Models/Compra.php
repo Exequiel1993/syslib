@@ -26,9 +26,13 @@ class Compra extends Model
 
 
     public $fillable = [
-        'cantidad',
+        
         'proveedor_id',
-        'articulo_id'
+        
+        
+        'numeroComprobante',
+        'total'
+
     ];
 
     /**
@@ -38,9 +42,9 @@ class Compra extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'cantidad' => 'string',
+        
         'proveedor_id' => 'integer',
-        'articulo_id' => 'integer'
+        
     ];
 
     /**
@@ -49,14 +53,12 @@ class Compra extends Model
      * @var array
      */
     public static $rules = [
-        'cantidad' => 'required',
+        
         'proveedor_id' => 'required',
-        'articulo_id' => 'required'
+        
     ];
 
-    public function articulo(){
-        return $this->belongsTo(Articulo::Class,'articulo_id');
-    }
+    
 
     public function proveedor(){
         return $this->belongsTo(Proveedor::Class,'proveedor_id');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\DataTables\ArticuloDataTable;
 use App\Models\Articulo;
 use PDF;
 

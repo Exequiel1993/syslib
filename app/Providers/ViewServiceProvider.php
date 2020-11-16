@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Providers;
+namespace App\Providers;
+use App\Models\Compra;
 use App\Models\Articulo;
 use App\Models\Proveedor;
 use App\Models\Marca;
@@ -28,6 +29,14 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        View::composer(['detalles.fields'], function ($view) {
+            $compraItems = Compra::pluck('numeroComprobante','id')->toArray();
+            $view->with('compraItems', $compraItems);
+        });
+        View::composer(['detalles.fields'], function ($view) {
+            $articuloItems = Articulo::pluck('codigoUnico','id')->toArray();
+            $view->with('articuloItems', $articuloItems);
+        });
         View::composer(['compras.fields'], function ($view) {
             $articuloItems = Articulo::pluck('codigoUnico','id')->toArray();
             $view->with('articuloItems', $articuloItems);

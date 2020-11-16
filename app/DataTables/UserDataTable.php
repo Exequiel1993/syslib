@@ -48,12 +48,13 @@ class UserDataTable extends DataTable
                 'ordering'=>false,                 //////Habilita o desabilita funcion de orden
                 //'stateSave' => true,
                 //'order'     => [[0, 'desc']],
+                'language'=> ['url'=>'//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json',],
                 'buttons'   => [
-                    ['extend' => 'create', 'className' => 'btn btn-default btn-sm no-corner',],
+                  /*  ['extend' => 'create', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'export', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'print', 'className' => 'btn btn-default btn-sm no-corner',],
                     ['extend' => 'reset', 'className' => 'btn btn-default btn-sm no-corner',],
-                    ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],
+                    ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],*/
                 ],
             ]);
     }
@@ -66,9 +67,9 @@ class UserDataTable extends DataTable
     protected function getColumns()
     {
         return [
-            'name',
-            'email',
-            'phone',
+            'nombre'=> new \Yajra\DataTables\Html\Column(['title'=>'Nombre','data'=>'name','name'=>'name']),
+            'correo'=> new \Yajra\DataTables\Html\Column(['title'=>'Correo','data'=>'email','name'=>'email']),
+            'telefeno'=> new \Yajra\DataTables\Html\Column(['title'=>'Telefono','data'=>'phone','name'=>'phone']),
         ];
     }
 

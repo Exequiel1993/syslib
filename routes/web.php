@@ -12,7 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+
+    return view('auth.login');
+
 });
 
 Auth::routes(['verify' => true]);
@@ -37,3 +39,7 @@ Route::resource('compras', 'CompraController');
 Route::get('/pdf','PDFcontroller@pdf')->name('descargarPDF');
 
 Route::get('/pdfarticulos','PDFcontroller@pdfArticulos')->name('descargarPDFarticulos');
+
+Route::resource('detalles', 'DetalleController');
+
+Route::resource('informes', 'InformeController');

@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\MarcaDataTable;
-use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateMarcaRequest;
 use App\Http\Requests\UpdateMarcaRequest;
 use App\Repositories\MarcaRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Informe;
+use DB;
 
 class MarcaController extends AppBaseController
 {
@@ -27,9 +29,99 @@ class MarcaController extends AppBaseController
      * @param MarcaDataTable $marcaDataTable
      * @return Response
      */
-    public function index(MarcaDataTable $marcaDataTable)
+    public function index(Request $request)
     {
-        return $marcaDataTable->render('marcas.index');
+        $desde = $request->get('desde');
+        $hasta = $request->get('hasta');
+        $buscar = $request->get('buscarTexto');
+        $informe = Informe::find(1);
+
+
+         $marca=DB::table('marcas')
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+        if ($request->exists('filtrar')) {
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+                    $marca=DB::table('marcas')
+                        ->whereBetween('created_at',[$desde,$hasta])
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+                    
+
+                    return view('marcas.index',["marca"=>$marca,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+            
+            if(!is_null($desde) && is_null($hasta)){
+
+                    $marca=DB::table('marcas')
+                        ->where('created_at','>=',$desde)
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+
+                    
+
+                    return view('marcas.index',["marca"=>$marca,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+
+        }
+
+        if ($request->exists('pdf')) {
+
+            $reporte = \App::make('dompdf.wrapper');
+            $nombreInforme = "Marcas";
+           
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+                    $marca =DB::table('marcas')
+                        ->whereBetween('created_at',[$desde,$hasta])
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+            }
+
+             if(!is_null($desde) && is_null($hasta)){
+
+                    $marca =DB::table('marcas')
+                        ->where('created_at','>=',$desde)
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+            }
+
+           
+
+            $reporte->loadView('reportes.informeMarca',compact('marca','informe','desde','hasta','nombreInforme'))->setPaper('a4');
+
+            return $reporte->download('Reporte' . '.pdf');
+            //return $tipoArticulo;
+
+        }
+        
+        if (!is_null($buscar)) {
+
+            $query = trim($request->get('buscarTexto'));
+                    $marca=DB::table('marcas')
+                        ->where('nombre','LIKE','%'.$query.'%')
+                        ->orderby('id','desc')
+                        ->whereNull('deleted_at')
+                        ->paginate(7);
+            
+            return view('marcas.index',compact('marca'));
+        }
+
+       
+
+        //return $marcaDataTable->render('marcas.index');
+
+        return view('marcas.index',compact('marca','desde','hasta'));
     }
 
     /**

@@ -46,6 +46,7 @@ class TipoArticuloDataTable extends DataTable
             ->parameters([
                 'dom'       => 'Bfrtip',
                 'ordering'=>false,
+                'language'=> ['url'=>'//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json',],
                 //'stateSave' => true,
                 //'order'     => [[0, 'desc']],
                 'buttons'   => [

@@ -3,13 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\CompraDataTable;
-use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateCompraRequest;
 use App\Http\Requests\UpdateCompraRequest;
 use App\Repositories\CompraRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Compra;
+use App\Models\Detalle;
+use App\Models\Articulo;
+use App\Models\Proveedor;
+use DB;
+use App\Models\Informe;
 
 class CompraController extends AppBaseController
 {
@@ -27,9 +33,92 @@ class CompraController extends AppBaseController
      * @param CompraDataTable $compraDataTable
      * @return Response
      */
-    public function index(CompraDataTable $compraDataTable)
+    public function index(Request $request)
     {
-        return $compraDataTable->render('compras.index');
+
+        $desde = $request->get('desde');
+        $hasta = $request->get('hasta');
+        $buscar = $request->get('buscarTexto');
+
+        $informe = Informe::find(1);
+
+
+        $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+        
+        if ($request->exists('filtrar')) {
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+
+                    $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->whereBetween('compras.created_at',[$desde,$hasta])
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+
+                    return view('compras.index',["compra"=>$compra,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+            
+            if(!is_null($desde) && is_null($hasta)){
+
+
+                    $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->where('compras.created_at','>=',$desde)
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+
+                    
+
+                    return view('compras.index',["compra"=>$compra,'desde'=>$desde,'hasta'=>$hasta]);
+            }
+
+        }
+
+         if ($request->exists('pdf')) {
+
+            $reporte = \App::make('dompdf.wrapper');
+            $nombreInforme = "Compras";
+           
+
+            if(!is_null($desde) && !is_null($hasta) ){
+
+                    $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->whereBetween('compras.created_at',[$desde,$hasta])
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+            }
+
+             if(!is_null($desde) && is_null($hasta)){
+
+                    $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->where('compras.created_at','>=',$desde)
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+            }
+
+    
+            $reporte->loadView('reportes.informeCompra',compact('compra','informe','desde','hasta','nombreInforme'))->setPaper('a4');
+
+            return $reporte->download('Reporte' . '.pdf');
+            //return $tipoArticulo;
+
+        }
+
+
+        //DD($compra);
+        //return $compraDataTable->render('compras.index');
+        return view('compras.index',compact('compra','desde','hasta'));
     }
 
     /**
@@ -51,13 +140,65 @@ class CompraController extends AppBaseController
      */
     public function store(CreateCompraRequest $request)
     {
+        
+        try {
+
+            DB::beginTransaction();
+
+            $compra = new Compra;
+
+            $compra->proveedor_id = $request->input('proveedor_id');
+            $compra->numeroComprobante = $request->input('numeroComprobante');
+            $compra->total = $request->input('total');
+            $compra->save();
+
+            $idarticulo = $request->input('idarticulo_unico');
+            $cantidad = $request->input('cantidad_articulo');
+            $precioCompra = $request->input('precio_compra');
+            $subtotal = $request->input('subtotal');;
+
+            $cont = 0;
+            
+            while ($cont < count($idarticulo)){
+                $detalle = new Detalle();
+                $detalle->articulo_id = $idarticulo[$cont];
+                $arti = Articulo::find($idarticulo[$cont]);
+                $arti->cantidad =  $arti->cantidad + $cantidad[$cont];
+                $arti->save();
+                $detalle->cantidad = $cantidad[$cont];
+                $detalle->precioCompra = $precioCompra[$cont];
+                $detalle->subtotal = $subtotal[$cont];
+                $detalle->compra_id = $compra->id;
+                $detalle->save();
+                $cont=$cont+1;
+            }
+
+            DB::commit();
+            
+        } catch (Exception $e) {
+            
+            DB::rollback();
+        }
+
+/*
         $input = $request->all();
-
         $compra = $this->compraRepository->create($input);
+        $input = $request->query('cantidad',150);
+    
+        $input[] = 
+        $input[] = $request->input('numeroComprobante');
+        $input[] = $request->input('articulo_id');
+        $input[] = $request->input('cantidad');
+        $input[] = $request->input('precioCompra');
+        $input[] = $request->input('total');
 
-        Flash::success('Compra saved successfully.');
+       
+
+        Flash::success('Compra guardada correctamente.');*/
 
         return redirect(route('compras.index'));
+
+        //return $input;
     }
 
     /**
@@ -69,15 +210,34 @@ class CompraController extends AppBaseController
      */
     public function show($id)
     {
-        $compra = $this->compraRepository->find($id);
+        //$compra = $this->compraRepository->find($id);
+        //$proveedor = Proveedor::find($compra->proveedor_id);
+        $compra=DB::table('compras')
+                        ->join('proveedors','compras.proveedor_id','=','proveedors.id')
+                        ->select('compras.*','proveedors.nombre as proveedor')
+                        ->where('compras.id','=',$id)
+                        ->whereNull('compras.deleted_at')
+                        ->get();
 
-        if (empty($compra)) {
-            Flash::error('Compra not found');
+        $detalle=DB::table('compras')
+                        ->join('detalles','detalles.compra_id','=','compras.id')
+                        ->join('articulos','detalles.articulo_id','=','articulos.id')
+                        ->select('compras.*','detalles.*','articulos.*')
+                        ->where('compras.id','=',$id)
+                        ->whereNull('compras.deleted_at')
+                        ->paginate(7);
+
+        
+
+
+        if (empty($detalle)) {
+            Flash::error('Compra no encontrada');
 
             return redirect(route('compras.index'));
         }
 
-        return view('compras.show')->with('compra', $compra);
+        return view('compras.show',compact('detalle','compra'));
+        //DD($detalle);
     }
 
     /**
@@ -92,7 +252,7 @@ class CompraController extends AppBaseController
         $compra = $this->compraRepository->find($id);
 
         if (empty($compra)) {
-            Flash::error('Compra not found');
+            Flash::error('Compra no encontrada');
 
             return redirect(route('compras.index'));
         }
@@ -113,14 +273,14 @@ class CompraController extends AppBaseController
         $compra = $this->compraRepository->find($id);
 
         if (empty($compra)) {
-            Flash::error('Compra not found');
+            Flash::error('Compra no encontrada');
 
             return redirect(route('compras.index'));
         }
 
         $compra = $this->compraRepository->update($request->all(), $id);
 
-        Flash::success('Compra updated successfully.');
+        Flash::success('Compra actualizada correctamente.');
 
         return redirect(route('compras.index'));
     }

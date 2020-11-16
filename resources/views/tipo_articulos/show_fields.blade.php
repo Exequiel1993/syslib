@@ -6,13 +6,9 @@
 
 <!-- Created At Field -->
 <div class="form-group">
-    {!! Form::label('created_at', 'Created At:') !!}
-    <p>{{ $tipoArticulo->created_at }}</p>
+    {!! Form::label('created_at', 'Fecha de Creacion:') !!}
+    <p>{{ $tipoArticulo->created_at->format('d/m/yy')}}</p>
 </div>
 
-<!-- Updated At Field -->
-<div class="form-group">
-    {!! Form::label('updated_at', 'Updated At:') !!}
-    <p>{{ $tipoArticulo->updated_at }}</p>
-</div>
+
 

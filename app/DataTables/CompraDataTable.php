@@ -29,7 +29,7 @@ class CompraDataTable extends DataTable
      */
     public function query(Compra $model)
     {
-        return $model->newQuery()->with(['articulo','proveedor']);
+        return $model->newQuery()->with(['proveedor']);
     }
 
     /**
@@ -45,9 +45,10 @@ class CompraDataTable extends DataTable
             ->addAction(['width' => '120px', 'printable' => false])
             ->parameters([
                 'dom'       => 'Bfrtip',
-                //'ordering'=>true,
+                'ordering'=>false,
                 //'stateSave' => true,
                 //'order'     => [[0, 'desc']],
+                'language'=> ['url'=>'//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json',],
                 'paging'=>true,
                 'buttons'   => [
                /*     ['extend' => 'create', 'className' => 'btn btn-default btn-sm no-corner',],
@@ -67,9 +68,11 @@ class CompraDataTable extends DataTable
     protected function getColumns()
     {
         return [
+            'fecha' => new \Yajra\DataTables\Html\Column(['title'=>'Fecha','data'=>'created_at','name'=>'created_at']),
             'proveedor' => new \Yajra\DataTables\Html\Column(['title'=>'Proveedor','data'=>'proveedor.nombre','name'=>'proveedor.nombre']),
-            'articulo_id',
-            'cantidad',
+            //'articulo_id',
+            'comprobante' => new \Yajra\DataTables\Html\Column(['title'=>'N° Comprobante','data'=>'numeroComprobante','name'=>'numeroComprobante']),
+            'total',
             //'articulo' => new \Yajra\DataTables\Html\Column(['title'=>'Articulo','data'=>'articulo.codigoUnico','name'=>'articulo.codigoUnico']),
             
             

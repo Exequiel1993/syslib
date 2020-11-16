@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Doctrine\DBAL\Query;
 
 /**
  * Class TipoArticulo
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property string $nombre
  */
-class TipoArticulo extends Model
+class TipoArticulo extends Model 
 {
     use SoftDeletes;
 
@@ -44,7 +45,7 @@ class TipoArticulo extends Model
      * @var array
      */
     public static $rules = [
-        'nombre' => 'required'
+        'nombre' => 'required|max: 50'
     ];
 
     

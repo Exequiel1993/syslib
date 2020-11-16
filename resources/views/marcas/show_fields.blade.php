@@ -6,13 +6,8 @@
 
 <!-- Created At Field -->
 <div class="form-group">
-    {!! Form::label('created_at', 'Created At:') !!}
-    <p>{{ $marca->created_at }}</p>
+    {!! Form::label('created_at', 'Fecha de creación') !!}
+    <p>{{ $marca->created_at->format('d/m/yy')}}</p>
 </div>
 
-<!-- Updated At Field -->
-<div class="form-group">
-    {!! Form::label('updated_at', 'Updated At:') !!}
-    <p>{{ $marca->updated_at }}</p>
-</div>
 

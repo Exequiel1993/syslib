@@ -20,7 +20,6 @@ class CreateArticulosTable extends Migration
             $table->string('descripcion');
             $table->string('imagen');
             $table->integer('cantidad');
-            $table->string('precioVenta');
             $table->string('stockMinimo');
             $table->string('stockMaximo');
             $table->integer('tipoArticulo_id')->unsigned();

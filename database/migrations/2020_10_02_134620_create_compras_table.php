@@ -16,13 +16,16 @@ class CreateComprasTable extends Migration
     {
         Schema::create('compras', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('cantidad');
+            //$table->string('cantidad');
+            $table->string('numeroComprobante');
+            //$table->integer('precioCompra');
             $table->integer('proveedor_id')->unsigned();
-            $table->integer('articulo_id')->unsigned();
+            //$table->integer('articulo_id')->unsigned();
+            $table->integer('total');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('proveedor_id')->references('id')->on('proveedors');
-            $table->foreign('articulo_id')->references('id')->on('articulos');
+            //$table->foreign('articulo_id')->references('id')->on('articulos');
 
         });
     }

@@ -17,9 +17,12 @@ class CompraRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'cantidad',
+        
         'proveedor_id',
-        'articulo_id'
+        
+        
+        'numeroComprobante',
+        'total'
     ];
 
     /**

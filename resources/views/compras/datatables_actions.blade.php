@@ -1,6 +1,6 @@
 {!! Form::open(['route' => ['compras.destroy', $id], 'method' => 'delete']) !!}
 <div class='btn-group'>
-    <a href="{{ route('compras.show', $id) }}" class='btn btn-default btn-xs'>
+    <a href="{{ route('compras.show',$id) }}" class='btn btn-default btn-xs'>
         <i class="glyphicon glyphicon-eye-open"></i>
     </a>
     <a href="{{ route('compras.edit', $id) }}" class='btn btn-default btn-xs'>
